@@ -10,8 +10,7 @@ using namespace std;
 int main()
 {
     cout << "Welcome...\n";
-    string input;
-    vector<string> stream;
+
     while (true)
     {
         prefix(cout);
@@ -24,9 +23,13 @@ int main()
         string word;
         while (ss >> word){
             args.push_back(word);
-            cout << word << "\n";
         }
+        clean_input(args);
+        
+        // for (int i = 0; i < args.size(); i++){
+        //     cout << args[i] << " ";
+        // }
 
-        // exec(&*input.begin());
+        exec(args);
     }
 }
