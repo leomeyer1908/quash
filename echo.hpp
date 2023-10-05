@@ -1,4 +1,6 @@
 #include <string>
 #include <iostream>
 
-void echo(std::string input);
+using namespace std;
+
+void echoFunction(string input);
