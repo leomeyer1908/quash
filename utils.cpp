@@ -8,6 +8,7 @@
 
 #include "export.cpp"
 #include "echo.hpp"
+#include "cd.hpp"
 
 using namespace std;
 
@@ -39,6 +40,9 @@ void exec(vector<string> input, vector<string> jobs){
         }
         result.pop_back();
         echoFunction(result);
+    }else if (input[0] == "cd")
+    {
+        cd(input[1]);
     }
     else
     {
