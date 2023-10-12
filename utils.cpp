@@ -53,11 +53,11 @@ void exec(vector<string> input){
 
 void clean_input(vector<string>& input){
     // remove comments
-    for (int i = 0; i < input.size(); i++){
-        if (input[i] == "#" || input[i][0] == '#'){
-            // cout << "comment found\n";
-            input = {input.begin(), input.begin() + i};
-            break;
-        }
-    }
+    // for (int i = 0; i < input.size(); i++){
+    //     if (input[i] == "#" || input[i][0] == '#'){
+    //         // cout << "comment found\n";
+    //         input = {input.begin(), input.begin() + i};
+    //         break;
+    //     }
+    // }
 }

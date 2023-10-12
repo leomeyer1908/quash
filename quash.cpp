@@ -20,9 +20,30 @@ int main()
 
         getline(cin, input, '\n');
         bool is_strlit = false;
+        bool is_storing_variable = false;
+        string current_variable = "";
         string current_token;
         for(int i = 0; i < input.size(); i++){
-            if (input[i] == '"'){
+            char c = input[i];
+            if (is_storing_variable) {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                    current_variable += c;
+                } else {
+                    const char* env_var = getenv((const char*) current_variable.c_str());
+                    if (env_var) {
+                        cout << env_var;
+                    }
+                    if (c != '$') {
+                        cout << c;
+                        is_storing_variable = false;
+                    }
+                    current_variable = "";
+                }
+            }
+            else if (input[i] == '$') {
+                is_storing_variable = true;
+            }
+            else if (input[i] == '"'){
                 is_strlit = !is_strlit;
             }
             else{
