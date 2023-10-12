@@ -14,7 +14,12 @@ void prefix(ostream& out){
     out << "[QUASH]$ ";
 }
 
-void exec(vector<string> input){
+void exec(vector<string> input, vector<string> jobs){
+    bool is_background_process = false;
+    if (input[input.size()-1] == "&") {
+        is_background_process = true;
+    }
+
     if (input[0] == "exit" || input[0] == "quit")
     {
         exit(0);

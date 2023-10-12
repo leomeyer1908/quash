@@ -11,6 +11,8 @@ int main()
 {
     cout << "Welcome...\n";
 
+    vector<string> jobs;
+
     while (true)
     {
         prefix(cout);
@@ -68,6 +70,6 @@ int main()
         //     cout << args[i] << " ";
         // }
 
-        exec(args);
+        exec(args, jobs);
     }
 }
