@@ -11,11 +11,11 @@ bool is_process_running(int pid) {
     }
 };
 
-void jobs(std::vector<std::vector<std::string> > jobs) {
+void jobs_cmd(std::vector<std::vector<std::string> > jobs) {
     for (auto job : jobs) {
-        if (job[0] != "0")
+        if (job[0] != "0") {
             if (is_process_running(atoi((const char *) job[1].c_str()))) {
-                std::cout << "[" + job[0] + "] " + job[1] + " " + job[3];
+                std::cout << "[" + job[0] + "] " + job[1] + " " + job[2] << std::endl;
             } else {
                 job[0] = "0";
             }

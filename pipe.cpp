@@ -6,8 +6,8 @@
 
 using namespace std;
 
-void pipeCommands(char ***cmds, int num_cmds, vector<string> jobs)
-{
+void pipeCommands(char ***cmds, int num_cmds, vector<vector<string> > jobs)
+{ 
     int fds[2]; // file descriptors
     pipe(fds);
 

@@ -1,5 +1,5 @@
 quash: clean
-	g++ ./quash.cpp echo.cpp cd.cpp pwd.cpp -o quash
+	g++ -g -std=c++11 ./quash.cpp echo.cpp cd.cpp pwd.cpp jobs.cpp -o quash
 
 clean:
 	rm -f quash

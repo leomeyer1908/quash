@@ -9,6 +9,7 @@
 #include "export.cpp"
 #include "echo.hpp"
 #include "cd.hpp"
+#include "jobs.hpp"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ vector<string> charToStringList(char **input)
     return result;
 }
 
-int exec(vector<string> input, vector<string> jobs)
+int exec(vector<string> input, vector<vector<string> > &jobs)
 {
     bool is_background_process = false;
     if (input[input.size() - 1] == "&")
@@ -57,6 +58,9 @@ int exec(vector<string> input, vector<string> jobs)
     else if (input[0] == "cd")
     {
         cd(input[1]);
+    }
+    else if (input[0] == "jobs") {
+        jobs_cmd(jobs);
     }
     else
     {
@@ -94,19 +98,20 @@ int exec(vector<string> input, vector<string> jobs)
                 }
                 vector<string> *job = new vector<string>();
                 if (new_jobid == 0) {
-                    new_jobid = jobs.size();
+                    new_jobid = 1;
                     jobs.push_back(*job);
                 } else {
                     delete[] &jobs[new_jobid];
                     jobs[new_jobid] = *job;
                 }
-                jobs[new_jobid][0] = to_string(new_jobid);
-                jobs[new_jobid][1] = to_string(pid);
-                jobs[new_jobid][2] = "";
+                jobs[new_jobid-1].push_back(to_string(new_jobid));
+                jobs[new_jobid-1].push_back(to_string(pid));
+                jobs[new_jobid-1].push_back("");
                 for (int i = 0; i < input.size(); i++) {
-                    jobs[new_jobid][2] += input[i] + " ";
+                    jobs[new_jobid-1][2] += input[i] + " ";
                 }
-                jobs[new_jobid][2] += "&";
+                jobs[new_jobid-1][2] += "&";
+                cout << "Background job started: [" << new_jobid << "] " << pid << " " << jobs[new_jobid-1][2] << endl;
             }
         }
     }
