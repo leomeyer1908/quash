@@ -8,6 +8,7 @@
 
 #include "export.cpp"
 #include "echo.hpp"
+#include "cd.hpp"
 
 using namespace std;
 
@@ -16,9 +17,21 @@ void prefix(ostream &out)
     out << "[QUASH]$ ";
 }
 
-void exec(vector<string> input, vector<vector<string > > jobs){
+vector<string> charToStringList(char **input)
+{
+    vector<string> result;
+    for (int i = 0; input[i] != NULL; i++)
+    {
+        result.push_back(input[i]);
+    }
+    return result;
+}
+
+int exec(vector<string> input, vector<string> jobs)
+{
     bool is_background_process = false;
-    if (input[input.size()-1] == "&") {
+    if (input[input.size() - 1] == "&")
+    {
         is_background_process = true;
         input.pop_back();
     }
@@ -41,6 +54,10 @@ void exec(vector<string> input, vector<vector<string > > jobs){
         result.pop_back();
         echoFunction(result);
     }
+    else if (input[0] == "cd")
+    {
+        cd(input[1]);
+    }
     else
     {
         char **result = new char *[input.size() + 1];
@@ -59,6 +76,7 @@ void exec(vector<string> input, vector<vector<string > > jobs){
             if (res == -1)
             {
                 cout << input[0] << ": command not found\n";
+                return 1;
             }
         }
         else
@@ -92,7 +110,7 @@ void exec(vector<string> input, vector<vector<string > > jobs){
             }
         }
     }
-    return;
+    return 0;
 }
 
 void clean_input(vector<string> &input)
@@ -106,4 +124,25 @@ void clean_input(vector<string> &input)
             break;
         }
     }
+}
+
+vector<vector<string>> split_pipe(vector<string> input)
+{
+    vector<vector<string>> result;
+    vector<string> current_command;
+    for (int i = 0; i < input.size(); i++)
+    {
+        if (input[i] == "|")
+        {
+            result.push_back(current_command);
+            current_command.clear();
+        }
+        else
+        {
+            current_command.push_back(input[i]);
+        }
+    }
+    result.push_back(current_command);
+
+    return result;
 }
