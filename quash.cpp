@@ -11,7 +11,7 @@ int main()
 {
     cout << "Welcome...\n";
 
-    vector<string> jobs;
+    vector<vector<string > > jobs;
 
     while (true)
     {
@@ -33,7 +33,7 @@ int main()
                 } else {
                     const char* env_var = getenv((const char*) current_variable.c_str());
                     if (env_var) {
-                        cout << env_var;
+                        args.push_back(env_var);
                     }
                     if (c != '$') {
                         cout << c;

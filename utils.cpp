@@ -16,10 +16,11 @@ void prefix(ostream &out)
     out << "[QUASH]$ ";
 }
 
-void exec(vector<string> input, vector<string> jobs){
+void exec(vector<string> input, vector<vector<string > > jobs){
     bool is_background_process = false;
     if (input[input.size()-1] == "&") {
         is_background_process = true;
+        input.pop_back();
     }
 
     if (input[0] == "exit" || input[0] == "quit")
@@ -51,7 +52,8 @@ void exec(vector<string> input, vector<string> jobs){
         result[input.size()] = NULL;
 
         std::string file = "/bin/" + input[0];
-        if (fork() == 0)
+        int pid = fork();
+        if (pid == 0)
         {
             int res = execvp(file.c_str(), (char *const *)result);
             if (res == -1)
@@ -61,7 +63,33 @@ void exec(vector<string> input, vector<string> jobs){
         }
         else
         {
-            wait(nullptr);
+            if (!is_background_process) {
+                wait(nullptr);
+            } else {
+                int new_jobid = 0;
+                //check if previous pid is unsued:
+                for (int i = 0; i < jobs.size(); i++) {
+                    if (jobs[i][0] == "0") {
+                        new_jobid = i+1;
+                        break;
+                    }
+                }
+                vector<string> *job = new vector<string>();
+                if (new_jobid == 0) {
+                    new_jobid = jobs.size();
+                    jobs.push_back(*job);
+                } else {
+                    delete[] &jobs[new_jobid];
+                    jobs[new_jobid] = *job;
+                }
+                jobs[new_jobid][0] = to_string(new_jobid);
+                jobs[new_jobid][1] = to_string(pid);
+                jobs[new_jobid][2] = "";
+                for (int i = 0; i < input.size(); i++) {
+                    jobs[new_jobid][2] += input[i] + " ";
+                }
+                jobs[new_jobid][2] += "&";
+            }
         }
     }
     return;
