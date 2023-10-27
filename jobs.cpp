@@ -12,6 +12,7 @@ bool is_process_running(int pid) {
 };
 
 void jobs_cmd(std::vector<std::vector<std::string> > jobs) {
+    std::cout << jobs.size();
     for (auto job : jobs) {
         if (job[0] != "0") {
             if (is_process_running(atoi((const char *) job[1].c_str()))) {

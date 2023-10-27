@@ -89,20 +89,22 @@ int exec(vector<string> input, vector<vector<string> > &jobs)
                 wait(nullptr);
             } else {
                 int new_jobid = 0;
+
                 //check if previous pid is unsued:
                 for (int i = 0; i < jobs.size(); i++) {
-                    if (jobs[i][0] == "0") {
+
+                    if (jobs[i][0] == "0" || !is_process_running(atoi((const char *) jobs[i][1].c_str()))) {
                         new_jobid = i+1;
                         break;
                     }
-                }
+                };
                 vector<string> *job = new vector<string>();
                 if (new_jobid == 0) {
-                    new_jobid = 1;
+                    new_jobid = jobs.size()+1;
                     jobs.push_back(*job);
                 } else {
-                    delete[] &jobs[new_jobid];
-                    jobs[new_jobid] = *job;
+                    delete &(jobs[new_jobid-1]);
+                    jobs[new_jobid-1] = *job;
                 }
                 jobs[new_jobid-1].push_back(to_string(new_jobid));
                 jobs[new_jobid-1].push_back(to_string(pid));
