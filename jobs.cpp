@@ -1,5 +1,7 @@
 #include "jobs.hpp"
 
+#include <sys/wait.h>
+
 bool is_process_running(int pid) {
     int status;
     pid_t result = waitpid(pid, &status, WNOHANG);
