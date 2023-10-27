@@ -10,6 +10,7 @@
 #include "echo.hpp"
 #include "cd.hpp"
 #include "jobs.hpp"
+#include "kill.hpp"
 
 using namespace std;
 
@@ -63,6 +64,10 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
     {
         jobs_cmd(jobs);
     }
+    else if (input[0] == "kill")
+    {
+        kill_cmd(jobs, input[1], stoi(input[2]));
+    }
     else
     {
         char **result = new char *[input.size() + 1];
@@ -102,13 +107,13 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
                         break;
                     }
                 };
-                vector<string> *job = new vector<string>();
+                vector<string> job = vector<string>();
                 if (new_jobid == 0) {
                     new_jobid = jobs.size()+1;
-                    jobs.push_back(*job);
+                    jobs.push_back(job);
                 } else {
-                    delete &(jobs[new_jobid-1]);
-                    jobs[new_jobid-1] = *job;
+                    jobs.erase(jobs.begin() + new_jobid - 1);
+                    jobs.insert(jobs.begin() + new_jobid - 1, job);
                 }
                 jobs[new_jobid - 1].push_back(to_string(new_jobid));
                 jobs[new_jobid - 1].push_back(to_string(pid));
