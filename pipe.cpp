@@ -6,47 +6,62 @@
 
 using namespace std;
 
-void pipeCommands(char ***cmds, int num_cmds, vector<vector<string> > jobs)
-{ 
-    int fds[2]; // file descriptors
-    pipe(fds);
+void pipeCommands(char ***cmds, int num_cmds, vector<vector<string>> jobs) {
 
-    if (fork() == 0)
-    {
-        // Reassign stdout to fds[1] end of pipe.
-        dup2(fds[1], STDOUT_FILENO);
-        close(fds[0]);
-        close(fds[1]);
-        // Execute the first command.
-        execvp(cmds[0][0], cmds[0]);
-    }
-    for (int i = 1; i < num_cmds - 1; i++)
-    {
-        if (fork() == 0)
-        {
-            // Reassign stdin to fds[0] end of pipe.
-            wait(NULL);
-            dup2(fds[0], STDIN_FILENO);
-            dup2(fds[1], STDOUT_FILENO);
-            close(fds[0]);
-            close(fds[1]);
-            // Execute the second command.
-            execvp(cmds[i][0], cmds[i]);
-            // exec(charToStringList(cmds[i]), jobs);
+    int fds[num_cmds - 1][2]; // One less pipe than commands
+
+    // Create pipes for each command except the last one
+    for (int i = 0; i < num_cmds - 1; i++) {
+        if (pipe(fds[i]) == -1) {
+            exit(1);
         }
     }
-    if (fork() == 0)
-    {
-        // Reassign stdin to fds[0] end of pipe.
-        wait(NULL);
-        dup2(fds[0], STDIN_FILENO);
-        close(fds[1]);
-        close(fds[0]);
-        // Execute the second command.
-        // exec(charToStringList(cmds[num_cmds - 1]), jobs);
-        execvp(cmds[num_cmds - 1][0], cmds[num_cmds - 1]);
+
+    for (int i = 0; i < num_cmds; i++) {
+        pid_t pid = fork();
+
+        if (pid == -1) {
+            exit(1);
+        }
+        else if (pid == 0) {
+            // Child process
+            // If not the first command, read from the previous pipe
+            if (i != 0) {
+                dup2(fds[i - 1][0], STDIN_FILENO);
+            }
+
+            // If not the last command, write to the next pipe
+            if (i != num_cmds - 1) {
+                dup2(fds[i][1], STDOUT_FILENO);
+            }
+
+            // Close all fds
+            for (int j = 0; j < num_cmds - 1; j++) {
+                close(fds[j][0]);
+                close(fds[j][1]);
+            }
+
+            // Execute the command
+            int res = execvp(cmds[i][0], cmds[i]);
+            if (res == -1) {
+                cout << cmds[i][0] << ": command not found\n";
+                return;
+            }
+        }
     }
-    close(fds[1]);
-    close(fds[0]);
-    wait(NULL);
+
+    // Close all fds
+    for (int j = 0; j < num_cmds - 1; j++) {
+        close(fds[j][0]);
+        close(fds[j][1]);
+    }
+
+    // Wait for all children to finish
+    for (int i = 0; i < num_cmds; i++) {
+        wait(NULL);
+    }
 }
+
+
+
+

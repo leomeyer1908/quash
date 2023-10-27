@@ -28,7 +28,7 @@ vector<string> charToStringList(char **input)
     return result;
 }
 
-int exec(vector<string> input, vector<vector<string> > &jobs)
+int exec(vector<string> input, vector<vector<string>> &jobs)
 {
     bool is_background_process = false;
     if (input[input.size() - 1] == "&")
@@ -59,7 +59,8 @@ int exec(vector<string> input, vector<vector<string> > &jobs)
     {
         cd(input[1]);
     }
-    else if (input[0] == "jobs") {
+    else if (input[0] == "jobs")
+    {
         jobs_cmd(jobs);
     }
     else
@@ -85,35 +86,49 @@ int exec(vector<string> input, vector<vector<string> > &jobs)
         }
         else
         {
-            if (!is_background_process) {
+            if (!is_background_process)
+            {
                 wait(nullptr);
-            } else {
+            }
+            else
+            {
                 int new_jobid = 0;
-                //check if previous pid is unsued:
-                for (int i = 0; i < jobs.size(); i++) {
-                    if (jobs[i][0] == "0") {
-                        new_jobid = i+1;
+                // check if previous pid is unsued:
+                for (int i = 0; i < jobs.size(); i++)
+                {
+                    if (jobs[i][0] == "0")
+                    {
+                        new_jobid = i + 1;
                         break;
                     }
                 }
                 vector<string> *job = new vector<string>();
-                if (new_jobid == 0) {
+                if (new_jobid == 0)
+                {
                     new_jobid = 1;
                     jobs.push_back(*job);
-                } else {
+                }
+                else
+                {
                     delete[] &jobs[new_jobid];
                     jobs[new_jobid] = *job;
                 }
-                jobs[new_jobid-1].push_back(to_string(new_jobid));
-                jobs[new_jobid-1].push_back(to_string(pid));
-                jobs[new_jobid-1].push_back("");
-                for (int i = 0; i < input.size(); i++) {
-                    jobs[new_jobid-1][2] += input[i] + " ";
+                jobs[new_jobid - 1].push_back(to_string(new_jobid));
+                jobs[new_jobid - 1].push_back(to_string(pid));
+                jobs[new_jobid - 1].push_back("");
+                for (int i = 0; i < input.size(); i++)
+                {
+                    jobs[new_jobid - 1][2] += input[i] + " ";
                 }
-                jobs[new_jobid-1][2] += "&";
-                cout << "Background job started: [" << new_jobid << "] " << pid << " " << jobs[new_jobid-1][2] << endl;
+                jobs[new_jobid - 1][2] += "&";
+                cout << "Background job started: [" << new_jobid << "] " << pid << " " << jobs[new_jobid - 1][2] << endl;
             }
         }
+        for (size_t i = 0; i < input.size(); i++)
+        {
+            delete[] result[i];
+        }
+        delete[] result;
     }
     return 0;
 }

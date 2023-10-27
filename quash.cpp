@@ -5,6 +5,7 @@
 
 #include "utils.cpp"
 #include "pipe.cpp"
+#include "redirects.cpp"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ int main()
 {
     cout << "Welcome...\n";
 
-    vector<vector<string > > jobs = {};
+    vector<vector<string>> jobs = {};
 
     while (true)
     {
@@ -79,30 +80,65 @@ int main()
         args.push_back(current_token);
 
         clean_input(args);
-
-        vector<vector<string>> commands = split_pipe(args);
-
-        if (commands.size() > 1)
+        bool has_pipe = false;
+        bool has_redirect_input = false;
+        bool has_redirect_output = false;
+        for (int i = 0; i < args.size(); i++)
         {
-            char ***cmds = new char **[commands.size()];
-            for (int i = 0; i < commands.size(); i++)
+            if (args[i] == "|")
             {
-                cmds[i] = new char *[commands[i].size() + 1];
-                for (int j = 0; j < commands[i].size(); j++)
-                {
-                    cmds[i][j] = new char[commands[i][j].length() + 1];
-                    strcpy(cmds[i][j], commands[i][j].c_str());
-                }
-                cmds[i][commands[i].size()] = NULL;
+                has_pipe = true;
+                break;
             }
+            if (args[i] == ">")
+            {
+                has_redirect_output = true;
+                break;
+            }
+            if (args[i] == "<")
+            {
+                has_redirect_input = true;
+                break;
+            }
+        }
+        if (has_pipe) // handle pipes if a pipe is present in the input
+        {
+            vector<vector<string>> commands = split_pipe(args);
 
-            pipeCommands(cmds, commands.size(), jobs);
-            wait(NULL);
+            if (commands.size() > 1)
+            {
+                char ***cmds = new char **[commands.size()];
+                for (int i = 0; i < commands.size(); i++)
+                {
+                    cmds[i] = new char *[commands[i].size() + 1];
+                    for (int j = 0; j < commands[i].size(); j++)
+                    {
+                        cmds[i][j] = new char[commands[i][j].length() + 1];
+                        strcpy(cmds[i][j], commands[i][j].c_str());
+                    }
+                    cmds[i][commands[i].size()] = NULL;
+                }
+
+                pipeCommands(cmds, commands.size(), jobs);
+                wait(NULL);
+            }
+            else
+            {
+                exec(commands[0], jobs);
+            }
+        }
+        else if (has_redirect_input){
+            redirectInput(args, jobs);
+        }
+        else if (has_redirect_output){
+            redirectOutput(args, jobs);
         }
         else
         {
-            exec(commands[0], jobs);
+            exec(args, jobs);
         }
+
+        
     }
     return 0;
 }
