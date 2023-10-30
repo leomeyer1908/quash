@@ -78,7 +78,7 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
         }
         result[input.size()] = NULL;
 
-        std::string file = "/bin/" + input[0];
+        std::string file = input[0];
         int pid = fork();
         if (pid == 0)
         {
