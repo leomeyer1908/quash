@@ -151,13 +151,18 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
 
 void clean_input(vector<string> &input)
 {
-    // remove comments
+    // remove comments, whitespace, and empty strings
     for (int i = 0; i < input.size(); i++)
     {
         if (input[i] == "#" || input[i][0] == '#')
         {
             input = {input.begin(), input.begin() + i};
             break;
+        }
+        if (input[i] == "" || input[i] == " ")
+        {
+            input.erase(input.begin() + i);
+            i -= 1;
         }
     }
 }

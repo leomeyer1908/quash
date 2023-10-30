@@ -89,7 +89,7 @@ int main()
             }
             else
             {
-                if (!is_strlit && input[i] == ' ' && current_token.length() > 0)
+                if (!is_strlit && input[i] == ' ')
                 {
                     args.push_back(current_token);
                     current_token = "";
