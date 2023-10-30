@@ -124,6 +124,20 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
                 }
                 jobs[new_jobid - 1][2] += "&";
                 cout << "Background job started: [" << new_jobid << "] " << pid << " " << jobs[new_jobid - 1][2] << endl;
+                // //create a new process to print when background process finishes
+                // int checker_pid = fork();
+                // if (checker_pid == 0) {
+                //     auto result = waitpid(pid, NULL, 0);
+                //     cout << "FORK 1:" << pid << endl;
+                //     cout << "RESULT: "<< result << endl;
+                //     for (auto job : jobs) {
+                //         if (stoi(job[1]) == pid) {
+                //             cout << "Completed: [" << job[0] << "] " << job[1] << " " << job[2] << endl;
+                //             break;
+                //         }
+                //     }
+                //     exit(0);
+                // }
             }
         }
         for (size_t i = 0; i < input.size(); i++)

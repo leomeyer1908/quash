@@ -9,11 +9,39 @@
 
 using namespace std;
 
+static vector<vector<string>> jobs = {};
+
+void handleChildExit(int signo) {
+    if (signo == SIGCHLD) {
+        int status;
+        pid_t terminated_pid;
+
+        // Reap terminated child processes
+        while ((terminated_pid = waitpid(-1, &status, WNOHANG)) > 0) {
+            for (auto job : jobs) {
+                if (stoi(job[1]) == terminated_pid) {
+                    cout << "Completed: [" << job[0] << "] " << job[1] << " " << job[2] << endl;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 int main()
 {
-    cout << "Welcome...\n";
 
-    vector<vector<string>> jobs = {};
+    struct sigaction sa;
+    sa.sa_handler = handleChildExit;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        return 1;
+    }
+
+
+    cout << "Welcome...\n";
 
     while (true)
     {
