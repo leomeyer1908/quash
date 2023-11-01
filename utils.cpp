@@ -97,18 +97,17 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
             }
             else
             {
-                int new_jobid = 0;
+                int new_jobid = 1;
 
                 //check if previous pid is unsued:
                 for (int i = 0; i < jobs.size(); i++) {
 
-                    if (jobs[i][0] == "0" || !is_process_running(atoi((const char *) jobs[i][1].c_str()))) {
-                        new_jobid = i+1;
-                        break;
+                    if (is_process_running(atoi((const char *) jobs[i][1].c_str()))) {
+                        new_jobid = i+2;
                     }
                 };
                 vector<string> job = vector<string>();
-                if (new_jobid == 0) {
+                if (new_jobid == jobs.size()+1) {
                     new_jobid = jobs.size()+1;
                     jobs.push_back(job);
                 } else {
