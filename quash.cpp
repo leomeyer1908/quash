@@ -5,7 +5,6 @@
 
 #include "utils.cpp"
 #include "pipe.cpp"
-#include "redirects.cpp"
 
 using namespace std;
 
@@ -18,6 +17,8 @@ int main()
 
     while (true)
     {
+        freopen("/dev/tty", "r", stdin);
+        freopen("/dev/tty", "w", stdout);
         prefix(cout);
 
         vector<string> args;
@@ -92,65 +93,64 @@ int main()
         args.push_back(current_token);
 
         clean_input(args);
-        bool has_pipe = false;
-        bool has_redirect_input = false;
-        bool has_redirect_output = false;
-        for (int i = 0; i < args.size(); i++)
-        {
-            if (args[i] == "|")
-            {
-                has_pipe = true;
-                break;
-            }
-            if (args[i] == ">")
-            {
-                has_redirect_output = true;
-                break;
-            }
-            if (args[i] == "<")
-            {
-                has_redirect_input = true;
-                break;
-            }
-        }
-        if (has_pipe) // handle pipes if a pipe is present in the input
-        {
-            vector<vector<string>> commands = split_pipe(args);
 
-            if (commands.size() > 1)
-            {
-                char ***cmds = new char **[commands.size()];
-                for (int i = 0; i < commands.size(); i++)
-                {
-                    cmds[i] = new char *[commands[i].size() + 1];
-                    for (int j = 0; j < commands[i].size(); j++)
-                    {
-                        cmds[i][j] = new char[commands[i][j].length() + 1];
-                        strcpy(cmds[i][j], commands[i][j].c_str());
+        if (args.size() == 0) {
+            continue;
+        }
+
+        bool is_background_process = false;
+        if (args[args.size() - 1] == "&")
+        {
+            is_background_process = true;
+        }
+
+        vector<vector<string>> commands;
+        if (!is_background_process)
+        {
+            commands = split_pipe(args);
+            pipeCommands(commands, jobs);
+        }
+        else {
+            //removes the & for the actual command
+            commands = split_pipe(vector<string>(args.begin(), args.end() -1));
+
+            pid_t pid = fork();
+
+            if (pid == -1) {
+                exit(1);
+            }
+            else if (pid == 0) {
+                pipeCommands(commands, jobs);
+                exit(0);
+            }
+            else {
+                int new_jobid = 1;
+
+                //check if previous pid is unsued:
+                for (int i = 0; i < jobs.size(); i++) {
+
+                    if (is_process_running(atoi((const char *) jobs[i][1].c_str()))) {
+                        new_jobid = i+2;
                     }
-                    cmds[i][commands[i].size()] = NULL;
+                };
+                vector<string> job = vector<string>();
+                if (new_jobid == jobs.size()+1) {
+                    new_jobid = jobs.size()+1;
+                    jobs.push_back(job);
+                } else {
+                    jobs.erase(jobs.begin() + new_jobid - 1);
+                    jobs.insert(jobs.begin() + new_jobid - 1, job);
                 }
-
-                pipeCommands(cmds, commands.size(), jobs);
-                wait(NULL);
+                jobs[new_jobid - 1].push_back(to_string(new_jobid));
+                jobs[new_jobid - 1].push_back(to_string(pid));
+                jobs[new_jobid - 1].push_back("");
+                for (int i = 0; i < args.size(); i++)
+                {
+                    jobs[new_jobid - 1][2] += args[i] + " ";
+                }
+                cout << "Background job started: [" << new_jobid << "] " << pid << " " << jobs[new_jobid - 1][2] << endl;
             }
-            else
-            {
-                exec(commands[0], jobs);
-            }
         }
-        else if (has_redirect_input){
-            redirectInput(args, jobs);
-        }
-        else if (has_redirect_output){
-            redirectOutput(args, jobs);
-        }
-        else
-        {
-            exec(args, jobs);
-        }
-
-        
     }
     return 0;
 }
