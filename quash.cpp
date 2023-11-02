@@ -54,14 +54,11 @@ int main()
                     const char *env_var = getenv((const char *)current_variable.c_str());
                     if (env_var)
                     {
-                        args.push_back(env_var);
-                    }
-                    if (c != '$')
-                    {
-                        cout << c;
+                        current_token += env_var;
+                        current_variable = "";
+                        i--;
                         is_storing_variable = false;
                     }
-                    current_variable = "";
                 }
             }
             else if (input[i] == '$')
@@ -88,9 +85,10 @@ int main()
         const char *env_var = getenv((const char *)current_variable.c_str());
         if (env_var)
         {
-            args.push_back(env_var);
+            current_token += env_var;
         }
         args.push_back(current_token);
+
 
         clean_input(args);
 

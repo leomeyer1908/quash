@@ -50,7 +50,9 @@ int exec(vector<string> input, vector<vector<string>> &jobs)
         {
             result += input[i] + " ";
         }
-        result.pop_back();
+        if (result.size() > 0) {
+            result.pop_back();
+        }
         echoFunction(result);
     }
     else if (input[0] == "cd")
